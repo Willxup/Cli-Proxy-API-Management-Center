@@ -1351,6 +1351,8 @@
         "payload_invalid_number": "Nhập số hợp lệ",
         "payload_invalid_boolean": "Chọn true hoặc false",
         "payload_invalid_json": "Nhập JSON hợp lệ",
+        "invalid_server_id": "Nhập UUID khác không có dấu gạch nối.",
+        "invalid_oauth_error_rules": "Kiểm tra mã trạng thái, điều kiện khớp và hành động của {{channel}}.",
         "invalid_trusted_proxies": "Mỗi proxy đáng tin cậy phải là một địa chỉ IP hoặc CIDR hợp lệ.",
         "invalid_discovery_service_type": "Sử dụng định dạng _tên._tcp: tên phải gồm 1–15 chữ cái, chữ số hoặc dấu gạch nối, không bắt đầu hoặc kết thúc bằng dấu gạch nối.",
         "invalid_duration": "Nhập khoảng thời gian hợp lệ, chẳng hạn như 30s hoặc 3h",
@@ -1376,6 +1378,10 @@
         "add": "Thêm"
       },
       "serverExtras": {
+        "serverId": {
+          "label": "ID triển khai",
+          "hint": "UUID cố định của bản triển khai. Lưu giá trị trống sẽ tạo ID mới."
+        },
         "trustedProxies": {
           "label": "Proxy đáng tin cậy",
           "hint": "Địa chỉ IP hoặc CIDR; để trống nghĩa là các header chuyển tiếp không được tin cậy. Tin cậy dải mạng chứa tất cả địa chỉ có nguy cơ giả mạo IP client. Yêu cầu khởi động lại backend."
@@ -1415,6 +1421,11 @@
         "discoveryHint": "Yêu cầu giao diện mạng vật lý hỗ trợ multicast và địa chỉ lắng nghe non-loopback. Docker thường cần host networking; không đảm bảo khả năng tiếp cận."
       },
       "additions": {
+        "oauthErrorRules": {
+          "label": "Quy tắc lỗi yêu cầu OAuth",
+          "hint": "Đối chiếu lỗi từ máy chủ nguồn theo thứ tự cho từng kênh OAuth để quyết định chuyển thông tin xác thực và thời gian chờ.",
+          "channel": "Kênh OAuth (có thể nhập kênh của plugin)"
+        },
         "oauthTitle": "Hành vi của provider OAuth",
         "oauthHint": "Các cài đặt provider này chỉ áp dụng cho credential OAuth / file xác thực, không áp dụng cho credential API key.",
         "claudeTitle": "Claude",
@@ -1498,7 +1509,7 @@
         },
         "antigravityConnectionPoolMaxIdleConnsPerHost": {
           "label": "Số kết nối nhàn rỗi tối đa trên mỗi host",
-          "hint": "Số kết nối nhàn rỗi tối đa được duy trì cho mỗi host upstream trên mỗi credential. Mặc định: 2; giới hạn tối đa 100. Bằng 0 sẽ dùng mặc định của Go là 2; giá trị âm sẽ chuyển sang kết nối ngắn hạn."
+          "hint": "Số kết nối nhàn rỗi tối đa cho mỗi máy chủ nguồn và mỗi thông tin xác thực. Để trống để dùng mặc định 2, giới hạn là 100. Giá trị 0 hoặc âm sử dụng kết nối ngắn hạn."
         },
         "xaiInjectXSearch": {
           "label": "Chèn x_search",
@@ -1953,6 +1964,43 @@
     "version": "Phiên bản giao diện quản lý"
   },
   "providersPage": {
+    "connections": {
+      "edit": "Chỉnh sửa kết nối",
+      "create": "Thêm kết nối",
+      "search": "Tìm theo kết nối, khóa, URL hoặc tiền tố…",
+      "keyCount_one": "{{count}} khóa",
+      "keyCount_other": "{{count}} khóa",
+      "keysActive_one": "{{active}}/{{count}} khóa đang bật",
+      "keysActive_other": "{{active}}/{{count}} khóa đang bật",
+      "disableKeys": "Tắt tất cả khóa trong “{{name}}”",
+      "enableKeys": "Bật tất cả khóa trong “{{name}}”"
+    },
+    "nativeGroup": {
+      "defaults": "Thiết lập mặc định của kết nối",
+      "description": "Các khóa kế thừa thiết lập này trừ khi có giá trị ghi đè riêng. URL cơ sở áp dụng cho mọi khóa.",
+      "name": "Tên kết nối",
+      "headersJson": "Tiêu đề yêu cầu (đối tượng JSON)",
+      "excluded": "Mô hình bị loại trừ (mỗi dòng một mô hình)",
+      "pool": "Nhóm kết nối",
+      "configurePool": "Cấu hình nhóm kết nối",
+      "poolHint": "Khi thêm nhóm kết nối, tính năng tái sử dụng kết nối được bật theo mặc định. Mỗi khóa có các kết nối riêng. Nếu thời gian chờ hoặc giới hạn bằng 0 hay âm, kết nối sẽ không được tái sử dụng.",
+      "poolEnabled": "Tái sử dụng kết nối",
+      "poolAuto": "Mặc định (bật)",
+      "poolTimeout": "Thời gian chờ của kết nối nhàn rỗi",
+      "poolLimit": "Số kết nối nhàn rỗi tối đa trên mỗi máy chủ",
+      "invalidLimit": "Số kết nối nhàn rỗi tối đa phải là số nguyên an toàn.",
+      "modelNameRequired": "Nhập tên mô hình phía nhà cung cấp cho từng mô hình.",
+      "disabled": "Tắt nhóm khóa này"
+    },
+    "groupActions": {
+      "search": "Tìm kết nối, khóa, URL hoặc tiền tố…",
+      "create": "Tạo kết nối",
+      "edit": "Sửa kết nối",
+      "delete": "Xóa kết nối",
+      "append": "Thêm khóa",
+      "confirm": "Xóa kết nối “{{name}}” và tất cả {{count}} khóa?",
+      "settings": "Cài đặt kết nối"
+    },
     "header": {
       "title": "AI Provider",
       "activeResources": "{{active}}/{{total}} tài nguyên đang hoạt động",
@@ -2297,6 +2345,22 @@
       "removeModel": "Xóa model",
       "modelName": "Tên model",
       "modelAlias": "Bí danh (tùy chọn)"
+    },
+    "nativeKey": {
+      "routing": "Cài đặt giao thức",
+      "nativeToolSearch": "Tin cậy điểm cuối tùy chỉnh để tìm công cụ gốc của Anthropic",
+      "interactions": "Dùng Vertex Interactions API",
+      "openapi": "Dùng điểm cuối Vertex OpenAPI",
+      "location": "Khu vực OpenAPI",
+      "pool": "Nhóm kết nối",
+      "poolHint": "Cấu hình tùy chỉnh bật nhóm kết nối trừ khi bị tắt tại đây hoặc ở nhóm cha. Trường trống sẽ kế thừa. Thời gian chờ hoặc giới hạn không dương sẽ tắt tái sử dụng.",
+      "reuse": "Tái sử dụng kết nối đến máy chủ",
+      "timeout": "Thời gian chờ khi rảnh (ví dụ: 5m)",
+      "maxIdle": "Số kết nối rảnh tối đa mỗi máy chủ",
+      "invalidMaxIdle": "Số kết nối rảnh tối đa phải là số nguyên an toàn.",
+      "inheritHint": "Chỉ điền những gì khóa này khác biệt; trường để trống sẽ kế thừa cài đặt kết nối.",
+      "disableKey": "Tắt khóa này",
+      "disableShort": "Tắt"
     },
     "runtimePolicy": {
       "title": "Chính sách thực thi nâng cao",
